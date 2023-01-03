@@ -16,6 +16,11 @@ $user->register(NULL, "user1", "password1", "user1@example.com", "John", "Doe");
 </head>
 
 <body>
+    <?php
+    foreach ($details as $x) {
+        echo $x;
+    }
+    ?>
 
 </body>
 

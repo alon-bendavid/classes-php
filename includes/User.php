@@ -9,7 +9,7 @@ class User
     public $password;
     private $conn;
 
-
+    // database connection
     public  function __construct($servername, $username, $password, $dbname)
     {
 
@@ -17,6 +17,7 @@ class User
 
         return $this->conn;
     }
+    //register the acount into the database and print a tbale with the user details
     public function register($id, $login, $password, $email, $firstname, $lastname)
     {
         $password = password_hash($password, PASSWORD_DEFAULT);
