@@ -23,8 +23,11 @@ class database
     protected function connect()
     {
         $this->servername = "localhost";
-        $this->username = "localhost";
-        $this->password = "localhost";
-        $this->dbname = "localhost";
+        $this->username = "root";
+        $this->password = "";
+        $this->dbname = "classes";
+        $conn = new mysqli($this->servername, $this->username, $this->password, $this->dbname);
+
+        return $conn;
     }
 }
