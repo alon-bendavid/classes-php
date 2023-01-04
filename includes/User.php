@@ -1,7 +1,7 @@
 <?php
 class User
 {
-    private $id;
+    public $id;
     public $login;
     public $email;
     public $firstname;
@@ -17,27 +17,46 @@ class User
 
         return $this->conn;
     }
-    //register the acount into the database and print a tbale with the user details
-    public function register($id, $login, $password, $email, $firstname, $lastname)
+    // set values to the properties
+    public function setProperties($id, $login, $email, $firstname, $lastname, $password)
     {
-        $password = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $this->conn->prepare("INSERT INTO utilisateurs (id, login, password, email, firstname, lastname) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("isssss", $id, $login, $password, $email, $firstname, $lastname);
-        $stmt->execute();
+        $this->id = $id;
+        $this->login = $login;
+        $this->email = $email;
+        $this->firstname = $firstname;
+        $this->lastname = $lastname;
+        $this->password = $password;
     }
-    public function connect($login, $password)
-    {
 
-        $stmt = $this->conn->prepare("SELECT password FROM utilisateurs WHERE login = ?");
-        $stmt->bind_param("s", $login);
+    //register the acount into the database and print a tbale with the user details
+    public function register()
+    {
+        $stmt = $this->conn->prepare("INSERT INTO utilisateurs (id, login, email, firstname, lastname, password) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("isssss", $this->id, $this->login, $this->email, $this->firstname, $this->lastname, $this->password);
+        $stmt->execute();
+        return $stmt->affected_rows;
+    }
+    public function login($login, $password)
+    {
+        $stmt = $this->conn->prepare("SELECT * FROM users WHERE login = ? AND password = ?");
+        $stmt->bind_param("ss", $login, $password);
         $stmt->execute();
         $result = $stmt->get_result();
-        if ($result->num_rows > 0) {
+        if ($result->num_rows == 1) {
+            // login successful
+            session_start();
             $row = $result->fetch_assoc();
-            if (password_verify($password, $row['password'])) {
-                return true;
-            }
+            $_SESSION["id"] = $row["id"];
+            $_SESSION["login"] = $row["login"];
+            return true;
+        } else {
+            // login failed
+            return false;
         }
-        return false;
+    }
+    public function disconnect()
+    {
+        if (isset($_POST["disconnect"])) {
+        }
     }
 }
