@@ -25,4 +25,19 @@ class User
         $stmt->bind_param("isssss", $id, $login, $password, $email, $firstname, $lastname);
         $stmt->execute();
     }
+    public function connect($login, $password)
+    {
+
+        $stmt = $this->conn->prepare("SELECT password FROM utilisateurs WHERE login = ?");
+        $stmt->bind_param("s", $login);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            if (password_verify($password, $row['password'])) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
