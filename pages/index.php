@@ -4,6 +4,7 @@ require("../includes/User.php");
 $user = new User("localhost", "root", "", "classes");
 $user->setProperties(null, "user2", "user2@example.com", "roling", "flozs", "password2");
 $result = $user->register();
+$user->getAllInfos();
 
 ?>
 <!DOCTYPE html>

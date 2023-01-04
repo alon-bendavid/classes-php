@@ -31,8 +31,10 @@ class User
     //register the acount into the database and print a tbale with the user details
     public function register()
     {
+        $hashedPassword = password_hash($this->password, PASSWORD_DEFAULT);
+
         $stmt = $this->conn->prepare("INSERT INTO utilisateurs (id, login, email, firstname, lastname, password) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("isssss", $this->id, $this->login, $this->email, $this->firstname, $this->lastname, $this->password);
+        $stmt->bind_param("isssss", $this->id, $this->login, $this->email, $this->firstname, $this->lastname, $hashedPassword);
         $stmt->execute();
         return $stmt->affected_rows;
     }
@@ -84,5 +86,15 @@ class User
         } else {
             return false;
         }
+    }
+    public function getAllInfos()
+    {
+        echo "<table>";
+        echo "<tr><th>ID</th><td>" . $this->id . "</td></tr>";
+        echo "<tr><th>Login</th><td>" . $this->login . "</td></tr>";
+        echo "<tr><th>Email</th><td>" . $this->email . "</td></tr>";
+        echo "<tr><th>First Name</th><td>" . $this->firstname . "</td></tr>";
+        echo "<tr><th>Last Name</th><td>" . $this->lastname . "</td></tr>";
+        echo "</table>";
     }
 }
