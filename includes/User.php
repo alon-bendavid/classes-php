@@ -1,7 +1,7 @@
 <?php
 class User
 {
-    public $id;
+    private $id;
     public $login;
     public $email;
     public $firstname;
@@ -36,6 +36,7 @@ class User
         $stmt->execute();
         return $stmt->affected_rows;
     }
+    // login into the site
     public function login($login, $password)
     {
         $stmt = $this->conn->prepare("SELECT * FROM users WHERE login = ? AND password = ?");
@@ -54,9 +55,34 @@ class User
             return false;
         }
     }
+    // disconnect user
     public function disconnect()
     {
-        if (isset($_POST["disconnect"])) {
+        session_unset();
+        session_destroy();
+    }
+    // delete current user
+    public function delete()
+    {
+        $stmt = $this->conn->prepare("DELETE FROM utilisateurs WHERE login = ?");
+        $stmt->bind_param("i", $this->login);
+        $stmt->execute();
+        session_unset();
+        session_destroy();
+    }
+    public function update($login, $password, $email, $firstname, $lastname)
+    {
+        $stmt = $this->conn->prepare("UPDATE utilisateurs SET login = ?, password = ?, email = ?, firstname = ?, lastname = ? WHERE login = ?");
+        $stmt->bind_param("sssssi", $login, $password, $email, $firstname, $lastname, $this->login);
+        $stmt->execute();
+        return $stmt->affected_rows;
+    }
+    public function isConnected()
+    {
+        if (isset($_SESSION["login"])) {
+            return true;
+        } else {
+            return false;
         }
     }
 }
