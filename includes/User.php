@@ -118,4 +118,20 @@ class User
         echo "<tr><th>Last Name</th><td>" . $this->lastname . "</td></tr>";
         echo "</table>";
     }
+    public function getLogin()
+    {
+        return $this->login;
+    }
+    public function getEmail()
+    {
+        return $this->email;
+    }
+    public function getFirstname()
+    {
+        return $this->firstname;
+    }
+    public function getLastname()
+    {
+        return $this->lastname;
+    }
 }
