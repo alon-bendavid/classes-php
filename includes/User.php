@@ -9,16 +9,9 @@ class User
     public $password;
     private $conn;
 
+
     // database connection
-    public  function __construct($servername, $username, $password, $dbname)
-    {
-
-        $this->conn = new mysqli($servername, $username, $password, $dbname);
-
-        return $this->conn;
-    }
-    // set values to the properties
-    public function setProperties($id, $login, $email, $firstname, $lastname, $password)
+    public  function __construct($id, $login, $email, $firstname, $lastname, $password)
     {
         $this->id = $id;
         $this->login = $login;
@@ -26,7 +19,22 @@ class User
         $this->firstname = $firstname;
         $this->lastname = $lastname;
         $this->password = $password;
+
+        $this->conn = new mysqli("localhost", "root", "", "classes");
+
+        return $this->conn;
     }
+
+    // set values to the properties
+    // public function setProperties($id, $login, $email, $firstname, $lastname, $password)
+    // {
+    //     $this->id = $id;
+    //     $this->login = $login;
+    //     $this->email = $email;
+    //     $this->firstname = $firstname;
+    //     $this->lastname = $lastname;
+    //     $this->password = $password;
+    // }
 
     //register the acount into the database and print a tbale with the user details
     public function register()
@@ -38,6 +46,7 @@ class User
         $stmt->execute();
         return $stmt->affected_rows;
     }
+
     // login into the site
     public function login($login, $password)
     {
@@ -57,12 +66,14 @@ class User
             return false;
         }
     }
+
     // disconnect user
     public function disconnect()
     {
         session_unset();
         session_destroy();
     }
+
     // delete current user
     public function delete()
     {
