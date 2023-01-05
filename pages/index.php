@@ -1,9 +1,16 @@
 <?php
 require("../includes/User.php");
+$id = null;
+$login = "bbbb";
+$email = "bbb@test.com";
+$firstname =  "bbb";
+$lastname = "reqsdgister";
+$password = "1234";
 
-$user = new User(null, "newuser", "newuser@example.com", "blop", "shlop", "password5");
+
+$user = new User(null, $login, $email, $firstname, $lastname, $password);
 // $user->setProperties(null, "user2", "user2@example.com", "roling", "flozs", "password2");
-$result = $user->register();
+$result = $user->register($login, $email, $firstname, $lastname, $password);
 $user->getAllInfos();
 
 ?>

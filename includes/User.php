@@ -25,44 +25,54 @@ class User
         return $this->conn;
     }
 
-    // set values to the properties
-    // public function setProperties($id, $login, $email, $firstname, $lastname, $password)
-    // {
-    //     $this->id = $id;
-    //     $this->login = $login;
-    //     $this->email = $email;
-    //     $this->firstname = $firstname;
-    //     $this->lastname = $lastname;
-    //     $this->password = $password;
-    // }
 
     //register the acount into the database and print a tbale with the user details
-    public function register()
+    public function register($login, $email, $firstname, $lastname, $password)
     {
-        $hashedPassword = password_hash($this->password, PASSWORD_DEFAULT);
-
-        $stmt = $this->conn->prepare("INSERT INTO utilisateurs (id, login, email, firstname, lastname, password) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("isssss", $this->id, $this->login, $this->email, $this->firstname, $this->lastname, $hashedPassword);
+        // check if username already exist
+        $stmt = $this->conn->prepare("SELECT id FROM utilisateurs WHERE login = ?");
+        $stmt->bind_param("s", $login);
         $stmt->execute();
-        return $stmt->affected_rows;
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            return "username already exist";
+        }
+
+        // Check for duplicate email
+        $stmt = $this->conn->prepare("SELECT id FROM utilisateurs WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            return "email already exist";
+        }
+
+        // Hash password
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+        // Insert new user
+        $stmt = $this->conn->prepare("INSERT INTO utilisateurs (login, password, email, firstname, lastname) VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssss", $login, $hashed_password, $email, $firstname, $lastname);
+        if ($stmt->execute()) {
+            return "username created";
+        } else {
+            return "error";
+        }
     }
 
-    // login into the site
+
+    //login user
     public function login($login, $password)
     {
-        $stmt = $this->conn->prepare("SELECT * FROM users WHERE login = ? AND password = ?");
-        $stmt->bind_param("ss", $login, $password);
+        $stmt = $this->conn->prepare("SELECT id, password FROM utilisateurs WHERE login = ?");
+        $stmt->bind_param("s", $login);
         $stmt->execute();
-        $result = $stmt->get_result();
-        if ($result->num_rows == 1) {
-            // login successful
-            session_start();
-            $row = $result->fetch_assoc();
-            $_SESSION["id"] = $row["id"];
-            $_SESSION["login"] = $row["login"];
+        $stmt->bind_result($id, $hashed_password);
+        $stmt->fetch();
+        if (password_verify($password, $hashed_password)) {
+            $this->id = $id;
             return true;
         } else {
-            // login failed
             return false;
         }
     }
