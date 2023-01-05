@@ -71,6 +71,7 @@ class User
         $stmt->fetch();
         if (password_verify($password, $hashed_password)) {
             $this->id = $id;
+            $_SESSION['user'] = $this->login;
             return true;
         } else {
             return false;
@@ -118,6 +119,7 @@ class User
         echo "<tr><th>Last Name</th><td>" . $this->lastname . "</td></tr>";
         echo "</table>";
     }
+    //return specific user information
     public function getLogin()
     {
         return $this->login;
