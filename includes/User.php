@@ -10,7 +10,7 @@ class User
     private $conn;
 
 
-    // database connection
+    // database connection----------------------------------------------------------------------------------------------------------------------------
     public  function __construct($id, $login, $email, $firstname, $lastname, $password)
     {
         $this->id = $id;
@@ -26,7 +26,7 @@ class User
     }
 
 
-    //register the acount into the database and print a tbale with the user details
+    //register the acount into the database and print a tbale with the user details----------------------------------------------------------------
     public function register($login, $email, $firstname, $lastname, $password)
     {
         // check if username already exist
@@ -61,7 +61,7 @@ class User
     }
 
 
-    //login user
+    //login user--------------------------------------------------------------------------------------------------------------------------
     public function login($login, $password)
     {
         $stmt = $this->conn->prepare("SELECT id, password FROM utilisateurs WHERE login = ?");
@@ -78,14 +78,14 @@ class User
         }
     }
 
-    // disconnect user
+    // disconnect user---------------------------------------------------------------------------------------------------------------------
     public function disconnect()
     {
         session_unset();
         session_destroy();
     }
 
-    // delete current user
+    // delete current user-----------------------------------------------------------------------------------------------------------------
     public function delete()
     {
         $stmt = $this->conn->prepare("DELETE FROM utilisateurs WHERE login = ?");
@@ -94,6 +94,7 @@ class User
         session_unset();
         session_destroy();
     }
+    // update the user information-----------------------------------------------------------------------------------------------------------
     public function update($login, $password, $email, $firstname, $lastname)
     {
         $stmt = $this->conn->prepare("UPDATE utilisateurs SET login = ?, password = ?, email = ?, firstname = ?, lastname = ? WHERE login = ?");
@@ -101,6 +102,7 @@ class User
         $stmt->execute();
         return $stmt->affected_rows;
     }
+    // check if user is connected------------------------------------------------------------------------------------------------------------
     public function isConnected()
     {
         if (isset($_SESSION["login"])) {
@@ -109,6 +111,7 @@ class User
             return false;
         }
     }
+    // fetch user info and present it as a table--------------------------------------------------------------------------------------------------
     public function getAllInfos()
     {
         echo "<table>";
@@ -119,19 +122,23 @@ class User
         echo "<tr><th>Last Name</th><td>" . $this->lastname . "</td></tr>";
         echo "</table>";
     }
-    //return specific user information
+    //return specific user information--------------------------------------------------------------------------------------------------------
+    // username--------------------------
     public function getLogin()
     {
         return $this->login;
     }
+    // email-----------------------------
     public function getEmail()
     {
         return $this->email;
     }
+    // first name------------------------
     public function getFirstname()
     {
         return $this->firstname;
     }
+    // last name-------------------------
     public function getLastname()
     {
         return $this->lastname;
