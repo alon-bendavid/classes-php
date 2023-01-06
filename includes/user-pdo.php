@@ -1,5 +1,5 @@
 <?php
-class User
+class Userpdo
 {
     private $id;
     public $login;
@@ -20,30 +20,32 @@ class User
         $this->lastname = $lastname;
         $this->password = $password;
 
-        $this->conn = new mysqli("localhost", "root", "", "classes");
+        try {
+            $this->conn = new PDO("mysql:host=localhost;dbname=classes", "root", "");
+        } catch (PDOException $fail) {
+            echo $fail->getMessage();
+        }
 
         return $this->conn;
     }
 
 
-    //register the acount into the database and print a tbale with the user details----------------------------------------------------------------
+    //register the acount into the database ----------------------------------------------------------------
     public function register($login, $email, $firstname, $lastname, $password)
     {
         // check if username already exist
         $stmt = $this->conn->prepare("SELECT id FROM utilisateurs WHERE login = ?");
-        $stmt->bind_param("s", $login);
+        $stmt->bindValue(1, $login, PDO::PARAM_STR);
         $stmt->execute();
-        $stmt->store_result();
-        if ($stmt->num_rows > 0) {
+        if ($stmt->rowCount() > 0) {
             return "username already exist";
         }
 
         // Check for duplicate email
         $stmt = $this->conn->prepare("SELECT id FROM utilisateurs WHERE email = ?");
-        $stmt->bind_param("s", $email);
+        $stmt->bindValue(1, $email, PDO::PARAM_STR);
         $stmt->execute();
-        $stmt->store_result();
-        if ($stmt->num_rows > 0) {
+        if ($stmt->rowCount() > 0) {
             return "email already exist";
         }
 
@@ -52,7 +54,11 @@ class User
 
         // Insert new user
         $stmt = $this->conn->prepare("INSERT INTO utilisateurs (login, password, email, firstname, lastname) VALUES (?, ?, ?, ?, ?)");
-        $stmt->bind_param("sssss", $login, $hashed_password, $email, $firstname, $lastname);
+        $stmt->bindValue(1, $login, PDO::PARAM_STR);
+        $stmt->bindValue(2, $hashed_password, PDO::PARAM_STR);
+        $stmt->bindValue(3, $email, PDO::PARAM_STR);
+        $stmt->bindValue(4, $firstname, PDO::PARAM_STR);
+        $stmt->bindValue(5, $lastname, PDO::PARAM_STR);
         if ($stmt->execute()) {
             return "username created";
         } else {
@@ -61,13 +67,15 @@ class User
     }
 
 
+
     //login user--------------------------------------------------------------------------------------------------------------------------
     public function login($login, $password)
     {
         $stmt = $this->conn->prepare("SELECT id, password FROM utilisateurs WHERE login = ?");
-        $stmt->bind_param("s", $login);
+        $stmt->bindValue(1, $login, PDO::PARAM_STR);
         $stmt->execute();
-        $stmt->bind_result($id, $hashed_password);
+        $stmt->bindColumn(1, $id, PDO::PARAM_INT);
+        $stmt->bindColumn(2, $hashed_password, PDO::PARAM_STR);
         $stmt->fetch();
         if (password_verify($password, $hashed_password)) {
             $this->id = $id;
@@ -77,6 +85,7 @@ class User
             return false;
         }
     }
+
 
     // disconnect user---------------------------------------------------------------------------------------------------------------------
     public function disconnect()
@@ -89,19 +98,26 @@ class User
     public function delete()
     {
         $stmt = $this->conn->prepare("DELETE FROM utilisateurs WHERE login = ?");
-        $stmt->bind_param("i", $this->login);
+        $stmt->bindValue(1, $this->login, PDO::PARAM_STR);
         $stmt->execute();
         session_unset();
         session_destroy();
     }
+
     // update the user information-----------------------------------------------------------------------------------------------------------
     public function update($login, $password, $email, $firstname, $lastname)
     {
         $stmt = $this->conn->prepare("UPDATE utilisateurs SET login = ?, password = ?, email = ?, firstname = ?, lastname = ? WHERE login = ?");
-        $stmt->bind_param("ssssss", $login, $password, $email, $firstname, $lastname, $this->login);
+        $stmt->bindValue(1, $login, PDO::PARAM_STR);
+        $stmt->bindValue(2, $password, PDO::PARAM_STR);
+        $stmt->bindValue(3, $email, PDO::PARAM_STR);
+        $stmt->bindValue(4, $firstname, PDO::PARAM_STR);
+        $stmt->bindValue(5, $lastname, PDO::PARAM_STR);
+        $stmt->bindValue(6, $this->login, PDO::PARAM_STR);
         $stmt->execute();
-        return $stmt->affected_rows;
+        return $stmt->rowCount();
     }
+
     // check if user is connected------------------------------------------------------------------------------------------------------------
     public function isConnected()
     {
@@ -144,3 +160,5 @@ class User
         return $this->lastname;
     }
 }
+// $user = new Userpdo(null, "pdo test", "pdo@gmail.com", "pdo", "newpdo", "1234");
+// $user->register("pdo test", "pdo@gmail.com", "pdo", "newpdo", "1234");
