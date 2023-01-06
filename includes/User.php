@@ -89,7 +89,7 @@ class User
     public function delete()
     {
         $stmt = $this->conn->prepare("DELETE FROM utilisateurs WHERE login = ?");
-        $stmt->bind_param("i", $this->login);
+        $stmt->bind_param("s", $this->login);
         $stmt->execute();
         session_unset();
         session_destroy();

@@ -12,7 +12,6 @@ $user = new User(null, $login, $email, $firstname, $lastname, $password);
 // $user->setProperties(null, "user2", "user2@example.com", "roling", "flozs", "password2");
 $result = $user->register($login, $email, $firstname, $lastname, $password);
 $user->getAllInfos();
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
